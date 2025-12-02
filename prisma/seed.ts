@@ -1,27 +1,51 @@
+import { Role } from "@/generated/prisma/enums";
 import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
 import "dotenv/config";
-import { Prisma, PrismaClient } from "../src/generated/prisma/client";
+import { PrismaClient } from "../src/generated/prisma/client";
 
+// Create Postgres adapter for Neon
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL!,
 });
 
-const prisma = new PrismaClient({
-  adapter,
-});
+// Use Prisma 7 extension syntax
+const prisma = new PrismaClient({ adapter }).$extends({});
 
-const userData: Prisma.UserCreateInput[] = [
-  {
-    email: "alice@prisma.io",
-    name: "Alice",
-    contact_number: "7558380826",
-  },
-];
+async function main() {
+  console.log("🌱 Starting Key Admin seed...");
 
-export async function main() {
-  for (const u of userData) {
-    await prisma.user.create({ data: u });
+  // 1. Ensure KeyAdmin does not already exist
+  const existing = await prisma.keyAdmin.findFirst({
+    where: { role: Role.KEY_ADMIN },
+  });
+
+  if (existing) {
+    console.log("✔ KeyAdmin already exists, skipping seed.");
+    return;
   }
+
+  // 2. Hash password
+  const hashedPassword = await bcrypt.hash(process.env.KEY_ADMIN_PASSWORD!, 12);
+
+  // 3. Create KeyAdmin
+  const keyAdmin = await prisma.keyAdmin.create({
+    data: {
+      name: process.env.KEY_ADMIN_NAME!,
+      email: process.env.KEY_ADMIN_EMAIL!,
+      password: hashedPassword,
+      role: Role.KEY_ADMIN,
+    },
+  });
+
+  console.log("✔ Key Admin created successfully:", keyAdmin);
 }
 
-main();
+main()
+  .catch((err) => {
+    console.error("❌ Seed failed:", err);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

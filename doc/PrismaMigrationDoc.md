@@ -83,3 +83,7 @@ Whenever you update the Prisma schema:
 3. (Optional) **Run:** `npx prisma studio` to inspect data.
 
 Your project is now aligned with the updated database schema.
+
+
+## Seed Command
+npx prisma db seed 
