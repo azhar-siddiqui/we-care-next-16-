@@ -5,14 +5,9 @@ export enum Role {
   DOCTOR = "DOCTOR",
   PATIENT = "PATIENT",
 }
-
-export interface User {
+export interface LoggedInUser {
   id: string;
   name: string;
   email: string;
-  contactNumber: string;
   role: Role;
-  avtaar: string;
-  createdAt: Date;
-  updateAt: Date;
 }
