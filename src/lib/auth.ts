@@ -1,7 +1,8 @@
+import "server-only";
+
 import { LoggedInUser, Role } from "@/types";
 import bcrypt from "bcryptjs";
-import * as jose from "jose";
-// import crypto from "node:crypto";
+import { SignJWT, jwtVerify } from "jose";
 import { env } from "./env";
 
 const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET);
@@ -19,10 +20,11 @@ export async function comparePassword(
   return await bcrypt.compare(password, hashedPassword);
 }
 
+// Generate JWT
 export async function generateToken(
   loggedInUser: LoggedInUser
 ): Promise<string> {
-  const token = await new jose.SignJWT({
+  const token = await new SignJWT({
     loggedInUser,
     // randomBlock: crypto.randomBytes(512).toString("hex"),
     // issuedAtMillis: Date.now(),
@@ -38,20 +40,17 @@ export async function generateToken(
 }
 
 // Verify JWT
-export async function verifyToken(
+export async function verifyToken<T = Record<string, unknown>>(
   token: string
-): Promise<Record<string, unknown> | null> {
+): Promise<T | null> {
   try {
-    const { payload } = await jose.jwtVerify<Record<string, unknown>>(
-      token,
-      JWT_SECRET,
-      {
-        algorithms: ["HS256"],
-      }
-    );
+    const { payload } = await jwtVerify<T>(token, JWT_SECRET, {
+      algorithms: ["HS256"],
+    });
+
     return payload;
   } catch (error) {
-    console.error("ERR: on auth.ts", error);
+    console.error("JWT VERIFICATION FAILED:", error);
     return null;
   }
 }
