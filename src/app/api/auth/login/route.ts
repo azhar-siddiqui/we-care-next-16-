@@ -1,3 +1,4 @@
+import { HTTP_MESSAGE, HTTP_STATUS } from "@/constants/http";
 import serverResponse from "@/lib/api-response-helper";
 import { comparePassword, generateToken } from "@/lib/auth";
 import { env } from "@/lib/env";
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
         message: "Validation Error",
         error: formatZodError(parsed.error),
         data: undefined,
-        status: 400,
+        status: HTTP_STATUS.BAD_REQUEST,
       });
     }
     const { email, password } = parsed.data;
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
           message: "Invalid credentials",
           error: "Email or password is incorrect.",
           data: undefined,
-          status: 401,
+          status: HTTP_STATUS.UNAUTHORIZED,
         });
       }
 
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
           message: "Invalid credentials",
           error: "Email or password is incorrect.",
           data: undefined,
-          status: 401,
+          status: HTTP_STATUS.UNAUTHORIZED,
         });
       }
 
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
           message: "Invalid credentials",
           error: "Email or password is incorrect.",
           data: undefined,
-          status: 401,
+          status: HTTP_STATUS.UNAUTHORIZED,
         });
       }
 
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
         message: "Invalid credentials",
         error: "Email or password is incorrect.",
         data: undefined,
-        status: 401,
+        status: HTTP_STATUS.UNAUTHORIZED,
       });
     }
 
@@ -119,10 +120,8 @@ export async function POST(req: NextRequest) {
       success: true,
       message: "Login successful",
       error: undefined,
-      data: {
-        token,
-      },
-      status: 200,
+      data: undefined,
+      status: HTTP_STATUS.OK,
     });
 
     response.cookies.set({
@@ -140,10 +139,10 @@ export async function POST(req: NextRequest) {
     console.error("Login error:", error);
     return serverResponse({
       success: false,
-      message: "Internal Server Error",
+      message: HTTP_MESSAGE.INTERNAL_ERROR,
       error: "An unexpected error occurred.",
       data: undefined,
-      status: 500,
+      status: HTTP_STATUS.INTERNAL_ERROR,
     });
   }
 }

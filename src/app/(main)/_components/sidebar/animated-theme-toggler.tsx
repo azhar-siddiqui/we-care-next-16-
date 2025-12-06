@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
 import { cn } from "@/lib/utils";
-import { Button } from "./button";
+import { Button } from "../../../../components/ui/button";
 
 interface AnimatedThemeTogglerProps
   extends React.ComponentPropsWithoutRef<"button"> {
@@ -75,7 +75,7 @@ export const AnimatedThemeToggler = ({
     <Button
       ref={buttonRef}
       onClick={toggleTheme}
-      className={cn("border rounded-full", className)}
+      className={cn(className)}
       size="icon"
       variant="outline"
     >

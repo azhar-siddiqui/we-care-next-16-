@@ -1,5 +1,12 @@
-import { ThemeProvider } from "@/components/provider/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { getPreference } from "@/server/server-action";
+import { PreferencesStoreProvider } from "@/stores/preferences/preferences-provider";
+import {
+  THEME_MODE_VALUES,
+  THEME_PRESET_VALUES,
+  ThemeMode,
+  ThemePreset,
+} from "@/types/preferences/theme";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -50,22 +57,30 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeMode = await getPreference<ThemeMode>(
+    "theme_mode",
+    THEME_MODE_VALUES,
+    "light"
+  );
+  const themePreset = await getPreference<ThemePreset>(
+    "theme_preset",
+    THEME_PRESET_VALUES,
+    "default"
+  );
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+        <PreferencesStoreProvider
+          themeMode={themeMode}
+          themePreset={themePreset}
         >
           {children}
           <Toaster
@@ -75,7 +90,7 @@ export default function RootLayout({
             richColors
             closeButton
           />
-        </ThemeProvider>
+        </PreferencesStoreProvider>
       </body>
     </html>
   );
