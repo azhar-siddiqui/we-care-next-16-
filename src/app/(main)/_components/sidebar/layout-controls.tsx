@@ -5,16 +5,16 @@ import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { updateContentLayout, updateNavbarStyle } from "@/lib/layout-utils";
@@ -22,15 +22,15 @@ import { updateThemeMode, updateThemePreset } from "@/lib/theme-utils";
 import { setValueToCookie } from "@/server/server-action";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 import type {
-    ContentLayout,
-    NavbarStyle,
-    SidebarCollapsible,
-    SidebarVariant,
+  ContentLayout,
+  NavbarStyle,
+  SidebarCollapsible,
+  SidebarVariant,
 } from "@/types/preferences/layout";
 import {
-    THEME_PRESET_OPTIONS,
-    type ThemeMode,
-    type ThemePreset,
+  THEME_PRESET_OPTIONS,
+  type ThemeMode,
+  type ThemePreset,
 } from "@/types/preferences/theme";
 
 type LayoutControlsProps = {
@@ -96,12 +96,6 @@ export function LayoutControls(props: LayoutControlsProps) {
             </h4>
             <p className="text-muted-foreground text-xs">
               Customize your dashboard layout preferences.
-            </p>
-            <p className="text-xs font-medium italic">
-              *Controls are temporarily disabled while we adjust cookie-based
-              persistence, which was causing extra usage. They&apos;ll be
-              re-enabled soon. For full access you can clone the repo and run it
-              locally.
             </p>
           </div>
           <div className="space-y-3">

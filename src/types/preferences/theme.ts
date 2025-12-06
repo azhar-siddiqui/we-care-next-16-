@@ -56,6 +56,14 @@ export const THEME_PRESET_OPTIONS = [
       dark: "oklch(0.48 0.2 260.47)",
     },
   },
+  {
+    label: "Clean Slate",
+    value: "clean-slate",
+    primary: {
+      light: "oklch(0.59 0.2 277.06)",
+      dark: "oklch(0.59 0.2 277.06)",
+    },
+  },
 ] as const;
 
 export const THEME_PRESET_VALUES = THEME_PRESET_OPTIONS.map((p) => p.value);

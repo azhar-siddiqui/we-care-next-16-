@@ -73,7 +73,12 @@ export default async function RootLayout({
     "default"
   );
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={themeMode === "dark" ? "dark" : undefined}
+      data-theme-preset={themePreset}
+    >
       <head />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

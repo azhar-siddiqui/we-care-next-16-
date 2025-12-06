@@ -4,8 +4,10 @@ import { Moon, SunDim } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
+import { Button } from "@/components/ui/button";
+import { updateThemeMode } from "@/lib/theme-utils";
 import { cn } from "@/lib/utils";
-import { Button } from "../../../../components/ui/button";
+
 
 interface AnimatedThemeTogglerProps
   extends React.ComponentPropsWithoutRef<"button"> {
@@ -38,12 +40,17 @@ export const AnimatedThemeToggler = ({
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current) return;
 
+    const newTheme = !isDark;
+
     await document.startViewTransition(() => {
       flushSync(() => {
-        const newTheme = !isDark;
         setIsDark(newTheme);
-        document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", newTheme ? "dark" : "light");
+        // Use helper to update class with transition-free toggle
+        updateThemeMode(newTheme ? "dark" : "light");
+        // Persist the choice in a cookie so the server can read it on SSR
+        // 7 days
+        const maxAge = 60 * 60 * 24 * 7;
+        document.cookie = `theme_mode=${newTheme ? "dark" : "light"}; path=/; max-age=${maxAge}`;
       });
     }).ready;
 
