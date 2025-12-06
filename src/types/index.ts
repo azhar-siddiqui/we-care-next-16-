@@ -11,3 +11,10 @@ export interface LoggedInUser {
   email: string;
   role: Role;
 }
+
+export const user = {
+  id: "sample-id",
+  name: "Azhar Siddiqui",
+  email: "azhartsiddiqui@gmail.com",
+  role: Role.KEY_ADMIN,
+};
