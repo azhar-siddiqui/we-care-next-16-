@@ -52,7 +52,7 @@ export function UserAuthForm({
       if (response.success) {
         form.reset();
         toast.success(`${response.message}`);
-        router.push("/dashboard");
+        router.push("/dashboard/default");
       } else {
         toast.error(`${response.message}`);
       }

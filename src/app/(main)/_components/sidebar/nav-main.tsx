@@ -78,7 +78,7 @@ const NavItemExpanded = ({
               tooltip={item.title}
             >
               <Link
-                prefetch={false}
+                // prefetch={false}
                 href={item.url}
                 target={item.newTab ? "_blank" : undefined}
               >

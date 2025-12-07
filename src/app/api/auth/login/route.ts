@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
     return serverResponse({
       success: false,
       message: HTTP_MESSAGE.INTERNAL_ERROR,
-      error: "An unexpected error occurred.",
+      error: `An unexpected error occurred. ${error}`,
       data: undefined,
       status: HTTP_STATUS.INTERNAL_ERROR,
     });

@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 
-export default function DashboardPage() {
+export default function DefaultPage() {
   return (
     <div>
-      <Button>Click Me</Button>
+      <Button>Default Click Me</Button>
     </div>
   );
 }

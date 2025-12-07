@@ -8,7 +8,8 @@ import {
   MessageSquareDot,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { logoutApiAction } from "@/actions/auth/logout";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,10 +27,28 @@ import {
 } from "@/components/ui/sidebar";
 import { useUser } from "@/context/user-context";
 import { getInitialsFallbackName } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 export function NavUser() {
   const user = useUser();
+  const router = useRouter();
   const { isMobile } = useSidebar();
+
+  const [isPending, startTransition] = useTransition();
+
+  function handleLogout() {
+    startTransition(async () => {
+      const response = await logoutApiAction();
+      if (response.success) {
+        toast.success(`${response.message}`);
+        router.replace("/login");
+      } else {
+        toast.error(JSON.stringify(response.error));
+      }
+    });
+  }
 
   return (
     <SidebarMenu>
@@ -64,7 +83,12 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  {/* <AvatarImage src={user.avatar || undefined} alt={user.name} /> */}
+                  {user?.avatar && (
+                    <AvatarImage
+                      src={user.avatar || undefined}
+                      alt={user.name}
+                    />
+                  )}
                   <AvatarFallback className="rounded-lg">
                     {getInitialsFallbackName(user!)}
                   </AvatarFallback>
@@ -93,7 +117,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
               <LogOut />
               Log out
             </DropdownMenuItem>

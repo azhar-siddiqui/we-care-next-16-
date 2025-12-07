@@ -10,7 +10,6 @@ import { UserProvider } from "@/context/user-context";
 import { verifyToken } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { getPreference } from "@/server/server-action";
-import { users } from "@/types";
 import {
   CONTENT_LAYOUT_VALUES,
   NAVBAR_STYLE_VALUES,
@@ -70,7 +69,7 @@ export default async function Layout({
 
   // Normalize user to match UserProvider prop type LoggedInUser | null
   const user = tokenPayload?.loggedInUser ?? null;
-  
+
   return (
     <UserProvider user={user}>
       <SidebarProvider defaultOpen={defaultOpen}>
@@ -104,7 +103,7 @@ export default async function Layout({
               <div className="flex items-center gap-2">
                 <LayoutControls {...layoutPreferences} />
                 <AnimatedThemeToggler />
-                <AccountSwitcher users={users} />
+                <AccountSwitcher user={user} />
               </div>
             </div>
           </header>

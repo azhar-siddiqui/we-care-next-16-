@@ -1,16 +1,13 @@
 import {
   Banknote,
-  Calendar,
   ChartBar,
   CircleHelp,
   ClipboardList,
   Database,
   Fingerprint,
-  Kanban,
   LayoutDashboard,
   Lock,
   Mail,
-  MessageSquare,
   ReceiptText,
   Search,
   Settings,
@@ -76,24 +73,7 @@ export const sidebarItems: NavGroup[] = [
         icon: Mail,
         comingSoon: true,
       },
-      {
-        title: "Chat",
-        url: "/dashboard/coming-soon",
-        icon: MessageSquare,
-        comingSoon: true,
-      },
-      {
-        title: "Calendar",
-        url: "/dashboard/coming-soon",
-        icon: Calendar,
-        comingSoon: true,
-      },
-      {
-        title: "Kanban",
-        url: "/dashboard/coming-soon",
-        icon: Kanban,
-        comingSoon: true,
-      },
+
       {
         title: "Invoice",
         url: "/dashboard/coming-soon",
@@ -119,8 +99,6 @@ export const sidebarItems: NavGroup[] = [
         subItems: [
           { title: "Login v1", url: "/auth/v1/login", newTab: true },
           { title: "Login v2", url: "/auth/v2/login", newTab: true },
-          { title: "Register v1", url: "/auth/v1/register", newTab: true },
-          { title: "Register v2", url: "/auth/v2/register", newTab: true },
         ],
       },
     ],
@@ -134,6 +112,30 @@ export const sidebarItems: NavGroup[] = [
         url: "/dashboard/coming-soon",
         icon: SquareArrowUpRight,
         comingSoon: true,
+      },
+    ],
+  },
+];
+
+export const sidebarItemsForKeyUser: NavGroup[] = [
+  {
+    id: 1,
+    label: "Dashboards",
+    items: [
+      {
+        title: "Default",
+        url: "/dashboard/default",
+        icon: LayoutDashboard,
+      },
+      {
+        title: "CRM",
+        url: "/dashboard/crm",
+        icon: ChartBar,
+      },
+      {
+        title: "Onboard Admins",
+        url: "/dashboard/onboard-admins",
+        icon: Users,
       },
     ],
   },

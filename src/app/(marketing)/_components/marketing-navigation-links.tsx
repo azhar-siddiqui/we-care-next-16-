@@ -8,7 +8,7 @@ export default async function MarketingNavigationLink() {
   const token = (await cookies()).get("token");
   return token ? (
     <Link
-      href="/dashboard"
+      href="/dashboard/default"
       className={cn(buttonVariants({ variant: "outline" }))}
     >
       Dashboard <ArrowRight className="size-4" />

@@ -1,4 +1,5 @@
 import { AnimatedThemeToggler } from "@/app/(main)/_components/sidebar/animated-theme-toggler";
+import ThemeSwitcher from "@/app/(main)/_components/sidebar/theme-switcher";
 import { FlaskConical } from "lucide-react";
 import Link from "next/link";
 import MarketingNavigationLink from "./marketing-navigation-links";
@@ -40,6 +41,7 @@ export default function MarketingHeader() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <ThemeSwitcher label={false} />
           <AnimatedThemeToggler />
           <MarketingNavigationLink />
         </div>

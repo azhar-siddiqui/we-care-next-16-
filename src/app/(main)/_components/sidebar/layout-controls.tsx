@@ -9,16 +9,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { updateContentLayout, updateNavbarStyle } from "@/lib/layout-utils";
-import { updateThemeMode, updateThemePreset } from "@/lib/theme-utils";
+import { updateThemeMode } from "@/lib/theme-utils";
 import { setValueToCookie } from "@/server/server-action";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 import type {
@@ -27,11 +20,8 @@ import type {
   SidebarCollapsible,
   SidebarVariant,
 } from "@/types/preferences/layout";
-import {
-  THEME_PRESET_OPTIONS,
-  type ThemeMode,
-  type ThemePreset,
-} from "@/types/preferences/theme";
+import { type ThemeMode } from "@/types/preferences/theme";
+import ThemeSwitcher from "./theme-switcher";
 
 type LayoutControlsProps = {
   readonly variant: SidebarVariant;
@@ -45,15 +35,12 @@ export function LayoutControls(props: LayoutControlsProps) {
 
   const themeMode = usePreferencesStore((s) => s.themeMode);
   const setThemeMode = usePreferencesStore((s) => s.setThemeMode);
-  const themePreset = usePreferencesStore((s) => s.themePreset);
-  const setThemePreset = usePreferencesStore((s) => s.setThemePreset);
 
   const handleValueChange = async (
     key: string,
     value:
       | string
       | ThemeMode
-      | ThemePreset
       | ContentLayout
       | NavbarStyle
       | SidebarCollapsible
@@ -63,12 +50,6 @@ export function LayoutControls(props: LayoutControlsProps) {
       const mode = value as ThemeMode;
       updateThemeMode(mode);
       setThemeMode(mode);
-    }
-
-    if (key === "theme_preset") {
-      const preset = value as ThemePreset;
-      updateThemePreset(preset);
-      setThemePreset(preset);
     }
 
     if (key === "content_layout") {
@@ -84,7 +65,7 @@ export function LayoutControls(props: LayoutControlsProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button size="icon"  variant="outline">
+        <Button size="icon" variant="outline">
           <Settings />
         </Button>
       </PopoverTrigger>
@@ -99,40 +80,7 @@ export function LayoutControls(props: LayoutControlsProps) {
             </p>
           </div>
           <div className="space-y-3">
-            <div className="space-y-1">
-              <Label className="text-xs font-medium">Preset</Label>
-              <Select
-                value={themePreset}
-                onValueChange={(value) =>
-                  handleValueChange("theme_preset", value)
-                }
-              >
-                <SelectTrigger size="sm" className="w-full text-xs">
-                  <SelectValue placeholder="Preset" />
-                </SelectTrigger>
-                <SelectContent>
-                  {THEME_PRESET_OPTIONS.map((preset) => (
-                    <SelectItem
-                      key={preset.value}
-                      className="text-xs"
-                      value={preset.value}
-                    >
-                      <span
-                        className="size-2.5 rounded-full"
-                        style={{
-                          backgroundColor:
-                            themeMode === "dark"
-                              ? preset.primary.dark
-                              : preset.primary.light,
-                        }}
-                      />
-                      {preset.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
+            <ThemeSwitcher />
             <div className="space-y-1">
               <Label className="text-xs font-medium">Mode</Label>
               <ToggleGroup

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./lib/auth"; // adjust path
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const token = request.cookies.get("token")?.value ?? null;
 
@@ -20,7 +20,7 @@ export default async function middleware(request: NextRequest) {
   if (path === "/login") {
     // If user already logged in → redirect to dashboard
     if (isValidToken) {
-      return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
+      return NextResponse.redirect(new URL("/dashboard/default", request.nextUrl));
     }
     // else allow login page
     return NextResponse.next();
