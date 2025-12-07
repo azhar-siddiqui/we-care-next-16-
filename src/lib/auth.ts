@@ -39,12 +39,14 @@ export async function generateToken(
   return token;
 }
 
+interface TokenPayload {
+  loggedInUser: LoggedInUser;
+}
+
 // Verify JWT
-export async function verifyToken<T = Record<string, unknown>>(
-  token: string
-): Promise<T | null> {
+export async function verifyToken(token: string): Promise<TokenPayload | null> {
   try {
-    const { payload } = await jwtVerify<T>(token, JWT_SECRET, {
+    const { payload } = await jwtVerify<TokenPayload>(token, JWT_SECRET, {
       algorithms: ["HS256"],
     });
 
@@ -54,6 +56,21 @@ export async function verifyToken<T = Record<string, unknown>>(
     return null;
   }
 }
+
+// export async function verifyToken<T = Record<string, unknown>>(
+//   token: string
+// ): Promise<T | null> {
+//   try {
+//     const { payload } = await jwtVerify<T>(token, JWT_SECRET, {
+//       algorithms: ["HS256"],
+//     });
+
+//     return payload;
+//   } catch (error) {
+//     console.error("JWT VERIFICATION FAILED:", error);
+//     return null;
+//   }
+// }
 
 export async function checkUserPermission(
   user: LoggedInUser,

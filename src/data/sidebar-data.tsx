@@ -2,6 +2,9 @@ import {
   Banknote,
   Calendar,
   ChartBar,
+  CircleHelp,
+  ClipboardList,
+  Database,
   Fingerprint,
   Kanban,
   LayoutDashboard,
@@ -9,9 +12,11 @@ import {
   Mail,
   MessageSquare,
   ReceiptText,
+  Search,
+  Settings,
   SquareArrowUpRight,
   Users,
-  type LucideIcon
+  type LucideIcon,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -133,3 +138,40 @@ export const sidebarItems: NavGroup[] = [
     ],
   },
 ];
+
+export const data = {
+  navSecondary: [
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings,
+    },
+    {
+      title: "Get Help",
+      url: "#",
+      icon: CircleHelp,
+    },
+    {
+      title: "Search",
+      url: "#",
+      icon: Search,
+    },
+  ],
+  documents: [
+    {
+      name: "Data Library",
+      url: "#",
+      icon: Database,
+    },
+    {
+      name: "Reports",
+      url: "#",
+      icon: ClipboardList,
+    },
+    {
+      name: "Word Assistant",
+      url: "#",
+      icon: File,
+    },
+  ],
+};

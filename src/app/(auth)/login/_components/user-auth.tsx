@@ -26,6 +26,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { loginInSchema } from "@/validation/auth/login";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+
 import { toast } from "sonner";
 
 type UserAuthFormProps = HTMLAttributes<HTMLFormElement>;
@@ -40,13 +41,12 @@ export function UserAuthForm({
   const form = useForm<z.infer<typeof loginInSchema>>({
     resolver: zodResolver(loginInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "weCareKeyAdmin7558@gmail.com",
+      password: "WeCareKeyAdmin@7558",
     },
   });
 
   function onSubmit(value: z.infer<typeof loginInSchema>) {
-    console.log(value);
     startTransition(async () => {
       const response = await loginInApiAction(value);
       if (response.success) {

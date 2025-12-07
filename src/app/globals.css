@@ -7,6 +7,7 @@
 @import "../styles/tangerine.css";
 @import "../styles/corporate.css";
 @import "../styles/clean-slate.css";
+@import "../styles/violet.css";
 
 @custom-variant dark (&:is(.dark *));
 

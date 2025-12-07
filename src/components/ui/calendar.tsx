@@ -1,9 +1,9 @@
 "use client";
 
 import {
-    ChevronDownIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "lucide-react";
 import * as React from "react";
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
@@ -87,8 +87,11 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
+        // Use a fixed locale format to ensure server and client render the same
+        // month label. Using "default" may pick different locales on server
+        // and client which leads to hydration mismatches.
         formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+          new Intl.DateTimeFormat("en-US", { month: "short" }).format(date),
         ...formatters,
       }}
       classNames={{
@@ -208,7 +211,9 @@ function CalendarDayButton({
       ref={ref}
       variant="ghost"
       size="icon"
-      data-day={day.date.toLocaleDateString()}
+      // Use an ISO date string for data attributes so the value is identical
+      // on server and client and cannot vary by locale.
+      data-day={day.date.toISOString()}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&
