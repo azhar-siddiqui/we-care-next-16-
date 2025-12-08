@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, lazy } from "react";
+import { ReactNode } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import {
@@ -23,13 +23,9 @@ import {
 import { cookies } from "next/headers";
 import { AccountSwitcher } from "./_components/sidebar/account-switcher";
 import { AnimatedThemeToggler } from "./_components/sidebar/animated-theme-toggler";
+import { AppSidebarWrapper } from "./_components/sidebar/app-sidebar-wrapper";
 import { LayoutControls } from "./_components/sidebar/layout-controls";
 import { SearchDialog } from "./_components/sidebar/search-dialog";
-const AppSidebar = lazy(() =>
-  import("./_components/sidebar/app-sidebar").then((mod) => ({
-    default: mod.AppSidebar,
-  }))
-);
 
 export default async function Layout({
   children,
@@ -77,12 +73,10 @@ export default async function Layout({
   return (
     <UserProvider user={user}>
       <SidebarProvider defaultOpen={defaultOpen}>
-        <Suspense fallback={null}>
-          <AppSidebar
-            variant={sidebarVariant}
-            collapsible={sidebarCollapsible}
-          />
-        </Suspense>
+        <AppSidebarWrapper
+          variant={sidebarVariant}
+          collapsible={sidebarCollapsible}
+        />
         <SidebarInset
           data-content-layout={contentLayout}
           suppressHydrationWarning

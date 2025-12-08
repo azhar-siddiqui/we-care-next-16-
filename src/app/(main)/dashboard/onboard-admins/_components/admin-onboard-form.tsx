@@ -51,7 +51,7 @@ export const AdmionOnboardingForm = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn("grid grid-cols-1 gap-3 md:grid-cols-4", className)}
+        className={cn("grid grid-cols-1 gap-4 md:grid-cols-4", className)}
         {...props}
       >
         <FormField
