@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, Suspense, lazy } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import {
@@ -23,9 +23,13 @@ import {
 import { cookies } from "next/headers";
 import { AccountSwitcher } from "./_components/sidebar/account-switcher";
 import { AnimatedThemeToggler } from "./_components/sidebar/animated-theme-toggler";
-import { AppSidebar } from "./_components/sidebar/app-sidebar";
 import { LayoutControls } from "./_components/sidebar/layout-controls";
 import { SearchDialog } from "./_components/sidebar/search-dialog";
+const AppSidebar = lazy(() =>
+  import("./_components/sidebar/app-sidebar").then((mod) => ({
+    default: mod.AppSidebar,
+  }))
+);
 
 export default async function Layout({
   children,
@@ -73,9 +77,15 @@ export default async function Layout({
   return (
     <UserProvider user={user}>
       <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar variant={sidebarVariant} collapsible={sidebarCollapsible} />
+        <Suspense fallback={null}>
+          <AppSidebar
+            variant={sidebarVariant}
+            collapsible={sidebarCollapsible}
+          />
+        </Suspense>
         <SidebarInset
           data-content-layout={contentLayout}
+          suppressHydrationWarning
           className={cn(
             "data-[content-layout=centered]:mx-auto! data-[content-layout=centered]:max-w-screen-2xl",
             // Adds right margin for inset sidebar in centered layout up to 113rem.
@@ -85,6 +95,7 @@ export default async function Layout({
         >
           <header
             data-navbar-style={navbarStyle}
+            suppressHydrationWarning
             className={cn(
               "flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12",
               // Handle sticky navbar style with conditional classes so blur, background, z-index, and rounded corners remain consistent across all SidebarVariant layouts.

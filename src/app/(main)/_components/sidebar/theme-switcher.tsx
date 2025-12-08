@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateThemePreset } from "@/lib/theme-utils";
+import { setValueToCookie } from "@/server/server-action";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 import { THEME_PRESET_OPTIONS, ThemePreset } from "@/types/preferences/theme";
@@ -17,12 +18,16 @@ export default function ThemeSwitcher({ label = true }: { label?: boolean }) {
   const themeMode = usePreferencesStore((s) => s.themeMode);
   const setThemePreset = usePreferencesStore((s) => s.setThemePreset);
 
-  const handleValueChange = (key: string, value: string | ThemePreset) => {
+  const handleValueChange = async (
+    key: string,
+    value: string | ThemePreset
+  ) => {
     if (key === "theme_preset") {
       const preset = value as ThemePreset;
       updateThemePreset(preset);
       setThemePreset(preset);
     }
+    await setValueToCookie(key, value);
   };
 
   return (

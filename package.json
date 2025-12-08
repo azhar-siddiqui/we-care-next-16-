@@ -11,7 +11,8 @@
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate dev",
     "db:seed": "npx prisma db seed",
-    "db:reset": "npx prisma migrate reset"
+    "db:reset": "npx prisma migrate reset",
+    "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -70,6 +71,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.7",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.15.6",

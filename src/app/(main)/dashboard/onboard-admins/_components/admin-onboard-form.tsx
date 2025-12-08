@@ -5,17 +5,16 @@ import { HTMLAttributes } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { LoaderCircle } from "lucide-react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -44,7 +43,8 @@ export const AdmionOnboardingForm = ({
   });
 
   function onSubmit(value: z.infer<typeof onboardAdminSchema>) {
-    console.log("Admin Onboard Form Submitted:", value);
+    // TODO: Implement form submission logic
+    // Removed console.log for production performance
   }
 
   return (
@@ -188,7 +188,6 @@ export const AdmionOnboardingForm = ({
         />
 
         <Button className="mt-2 md:col-span-4" disabled={false} type="submit">
-          {false && <LoaderCircle className="size-4 animate-spin" />}
           Create Account
         </Button>
       </form>
