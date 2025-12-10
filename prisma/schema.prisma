@@ -108,3 +108,14 @@ model Patient {
 
   @@map("patients")
 }
+
+// model ActiveToken {
+//   id        String   @id @default(uuid())
+//   jti       String   @unique
+//   userId    String
+//   userRole  Role
+//   expiresAt DateTime
+//   createdAt DateTime @default(now())
+
+//   @@map("active_tokens")
+// }
