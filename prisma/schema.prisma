@@ -109,13 +109,15 @@ model Patient {
   @@map("patients")
 }
 
-// model ActiveToken {
-//   id        String   @id @default(uuid())
-//   jti       String   @unique
-//   userId    String
-//   userRole  Role
-//   expiresAt DateTime
-//   createdAt DateTime @default(now())
+model RefreshToken {
+  id        String   @id @default(uuid())
+  jti       String   @unique
+  userId    String
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  ip        String?  @db.VarChar(100)
+  userAgent String?  @db.VarChar(500)
 
-//   @@map("active_tokens")
-// }
+  @@map("refresh_tokens")
+}

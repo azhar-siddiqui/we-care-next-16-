@@ -1,6 +1,10 @@
 import { HTTP_MESSAGE, HTTP_STATUS } from "@/constants/http";
 import serverResponse from "@/lib/api-response-helper";
-import { comparePassword, generateToken } from "@/lib/auth";
+import {
+  comparePassword,
+  generateAccessToken,
+  generateRefreshToken,
+} from "@/lib/auth";
 import { env } from "@/lib/env";
 import { formatZodError } from "@/lib/zod-error-msg";
 import { LoggedInUser } from "@/types";
@@ -114,7 +118,22 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const token = await generateToken(loggedInUser);
+    // Issue tokens: short-lived access token + long-lived refresh token stored in DB
+    const accessToken = await generateAccessToken(loggedInUser, "15m");
+
+    // Attempt to capture client ip / user-agent for refresh token metadata (best-effort)
+    // NextRequest does not expose `ip`; prefer X-Forwarded-For (may contain a comma-separated list)
+    const xForwardedFor = req.headers.get("x-forwarded-for");
+    const ip =
+      (xForwardedFor ? xForwardedFor.split(",")[0].trim() : undefined) ||
+      req.headers.get("x-real-ip") ||
+      "";
+    const userAgent = req.headers.get("user-agent") || undefined;
+    const refreshToken = await generateRefreshToken(loggedInUser.id, {
+      expiresIn: "30d",
+      ip,
+      userAgent,
+    });
 
     const response = serverResponse({
       success: true,
@@ -126,14 +145,24 @@ export async function POST(req: NextRequest) {
 
     response.cookies.set({
       name: "token",
-      value: token,
+      value: accessToken,
       httpOnly: true,
       secure: env.APP_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 15 * 60, // 15 minutes
     });
 
+    response.cookies.set({
+      name: "refresh_token",
+      value: refreshToken,
+      httpOnly: true,
+      secure: env.APP_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+    });
+    
     return response;
   } catch (error) {
     console.error("Login error:", error);

@@ -1,9 +1,8 @@
-import { Role } from "@/generated/prisma/enums";
-import { hashPassword } from "@/lib/auth";
-import { env } from "@/lib/env";
 import { PrismaPg } from "@prisma/adapter-pg";
-// import "dotenv/config";
+import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { Role } from "../src/generated/prisma/enums";
+import { env } from "../src/lib/env";
 
 // Create Postgres adapter for Neon
 const adapter = new PrismaPg({
@@ -27,7 +26,7 @@ async function main() {
   }
 
   // 2. Hash password
-  const hashedPassword = await hashPassword(env.KEY_ADMIN_PASSWORD);
+  const hashedPassword = await bcrypt.hash(env.KEY_ADMIN_PASSWORD, 12);
 
   // 3. Create KeyAdmin
   const keyAdmin = await prisma.keyAdmin.create({

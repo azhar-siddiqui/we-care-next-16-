@@ -7,9 +7,18 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { UserProvider } from "@/context/user-context";
-import { verifyToken } from "@/lib/auth";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  revokeRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+} from "@/lib/auth";
+import { env } from "@/lib/env";
+import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { getPreference } from "@/server/server-action";
+import { Role, type LoggedInUser } from "@/types";
 import {
   CONTENT_LAYOUT_VALUES,
   NAVBAR_STYLE_VALUES,
@@ -32,33 +41,108 @@ export default async function Layout({
 }: Readonly<{ children: ReactNode }>) {
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
-  const token = cookieStore.get("token")?.value;
+  const accessToken = cookieStore.get("token")?.value;
+  const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  const [
-    tokenPayload,
-    sidebarVariant,
-    sidebarCollapsible,
-    contentLayout,
-    navbarStyle,
-  ] = await Promise.all([
-    token ? verifyToken(token) : null,
-    getPreference<SidebarVariant>(
-      "sidebar_variant",
-      SIDEBAR_VARIANT_VALUES,
-      "inset"
-    ),
-    getPreference<SidebarCollapsible>(
-      "sidebar_collapsible",
-      SIDEBAR_COLLAPSIBLE_VALUES,
-      "icon"
-    ),
-    getPreference<ContentLayout>(
-      "content_layout",
-      CONTENT_LAYOUT_VALUES,
-      "centered"
-    ),
-    getPreference<NavbarStyle>("navbar_style", NAVBAR_STYLE_VALUES, "scroll"),
-  ]);
+  // Verify access token and fetch layout preferences in parallel
+  const [accessPayload, sidebarVariant, sidebarCollapsible, contentLayout, navbarStyle] =
+    await Promise.all([
+      accessToken ? verifyAccessToken(accessToken) : null,
+      getPreference<SidebarVariant>("sidebar_variant", SIDEBAR_VARIANT_VALUES, "inset"),
+      getPreference<SidebarCollapsible>("sidebar_collapsible", SIDEBAR_COLLAPSIBLE_VALUES, "icon"),
+      getPreference<ContentLayout>("content_layout", CONTENT_LAYOUT_VALUES, "centered"),
+      getPreference<NavbarStyle>("navbar_style", NAVBAR_STYLE_VALUES, "scroll"),
+    ]);
+
+  let user: LoggedInUser | null = accessPayload?.loggedInUser ?? null;
+
+  // If access token is missing/expired but a refresh token exists, attempt server-side refresh and rotation
+  if (!user && refreshToken) {
+    const verified = await verifyRefreshToken(refreshToken);
+    if (verified) {
+      const userId = verified.userId;
+
+      // Attempt to find the user across possible tables
+      const [keyAdmin, admin, usr] = await Promise.all([
+        prisma.keyAdmin.findUnique({ where: { id: userId } }),
+        prisma.admin.findUnique({ where: { id: userId } }),
+        prisma.user.findUnique({ where: { id: userId } }),
+      ]);
+
+      const found = keyAdmin ?? admin ?? usr;
+      if (found) {
+        // Type-safe helpers that narrow unknown object shapes without using `any`
+        const getName = (obj: unknown): string => {
+          if (obj && typeof obj === "object") {
+            if ("name" in obj && typeof (obj as { name: unknown }).name === "string") {
+              return (obj as { name: string }).name;
+            }
+            if ("ownerName" in obj && typeof (obj as { ownerName: unknown }).ownerName === "string") {
+              return (obj as { ownerName: string }).ownerName;
+            }
+          }
+          return "";
+        };
+
+        const getEmail = (obj: unknown): string => {
+          if (obj && typeof obj === "object") {
+            if ("email" in obj && typeof (obj as { email: unknown }).email === "string") {
+              return (obj as { email: string }).email;
+            }
+            if ("username" in obj && typeof (obj as { username: unknown }).username === "string") {
+              return (obj as { username: string }).username;
+            }
+          }
+          return "";
+        };
+
+        const getAvatar = (obj: unknown): string | undefined => {
+          if (obj && typeof obj === "object" && "avatar" in obj && typeof (obj as { avatar: unknown }).avatar === "string") {
+            return (obj as { avatar: string }).avatar;
+          }
+          return undefined;
+        };
+
+        const getRole = (obj: unknown): Role => {
+          if (obj && typeof obj === "object" && "role" in obj && typeof (obj as { role: unknown }).role === "string") {
+            return (obj as { role: Role }).role;
+          }
+          return Role.USER;
+        };
+
+        const loggedInUser: LoggedInUser = {
+          id: found.id,
+          name: getName(found),
+          email: getEmail(found),
+          avatar: getAvatar(found),
+          role: getRole(found),
+        };
+
+        // Revoke the old refresh token and issue rotated tokens
+        await revokeRefreshToken(verified.jti);
+        const newRefresh = await generateRefreshToken(userId, { expiresIn: "30d" });
+        const newAccess = await generateAccessToken(loggedInUser, "15m");
+
+        // Persist cookies server-side (path, httpOnly, secure in prod, sameSite strict)
+        cookieStore.set("token", newAccess, {
+          path: "/",
+          httpOnly: true,
+          sameSite: "strict",
+          secure: env.APP_ENV === "production",
+          maxAge: 15 * 60,
+        });
+        cookieStore.set("refresh_token", newRefresh, {
+          path: "/",
+          httpOnly: true,
+          sameSite: "strict",
+          secure: env.APP_ENV === "production",
+          maxAge: 30 * 24 * 60 * 60,
+        });
+
+        user = loggedInUser;
+      }
+    }
+  }
 
   const layoutPreferences = {
     contentLayout,
@@ -66,9 +150,6 @@ export default async function Layout({
     collapsible: sidebarCollapsible,
     navbarStyle,
   };
-
-  // Normalize user to match UserProvider prop type LoggedInUser | null
-  const user = tokenPayload?.loggedInUser ?? null;
 
   return (
     <UserProvider user={user}>

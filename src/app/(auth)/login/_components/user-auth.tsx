@@ -110,16 +110,6 @@ export function UserAuthForm({
           {isPending && <LoaderCircle className="size-4 animate-spin" />}
           Login
         </Button>
-
-        <Link
-          href="/sign-up"
-          className="text-muted-foreground text-sm sm:text-md text-center"
-        >
-          Dont have an account?{" "}
-          <span className="text-primary font-medium hover:opacity-75 hover:text-primary hover:underline underline-offset-4 ">
-            Sign up now
-          </span>
-        </Link>
       </form>
     </Form>
   );

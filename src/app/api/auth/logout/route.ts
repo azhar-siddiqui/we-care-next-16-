@@ -1,6 +1,6 @@
 import { HTTP_MESSAGE, HTTP_STATUS } from "@/constants/http";
 import serverResponse from "@/lib/api-response-helper";
-import { verifyToken } from "@/lib/auth";
+import { revokeRefreshToken, verifyRefreshToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export async function GET() {
@@ -8,9 +8,10 @@ export async function GET() {
     // Get cookies using Next.js cookies API
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
+    const refreshToken = cookieStore.get("refresh_token")?.value;
 
-    // Check if no token is present
-    if (!token) {
+    // If neither token present, user is not authenticated
+    if (!token && !refreshToken) {
       return serverResponse({
         success: false,
         message: "Not authenticated",
@@ -20,18 +21,12 @@ export async function GET() {
       });
     }
 
-    // Verify token (try admin token first, then user token)
-    const isValidToken = await verifyToken(token);
-
-    // If no valid token was found
-    if (!isValidToken) {
-      return serverResponse({
-        success: false,
-        message: "Invalid token",
-        error: "The provided token is invalid or has expired.",
-        status: HTTP_STATUS.UNAUTHORIZED,
-        data: undefined,
-      });
+    // If refresh token present, try to verify and revoke
+    if (refreshToken) {
+      const verified = await verifyRefreshToken(refreshToken);
+      if (verified) {
+        await revokeRefreshToken(verified.jti);
+      }
     }
 
     // Create response
@@ -43,11 +38,9 @@ export async function GET() {
       status: HTTP_STATUS.OK,
     });
 
-    // Clear both ADMIN_token and USER_token cookies
-    response.cookies.delete({
-      name: "token",
-      path: "/",
-    });
+    // Clear cookies
+    response.cookies.delete({ name: "token", path: "/" });
+    response.cookies.delete({ name: "refresh_token", path: "/" });
 
     return response;
   } catch (error) {
