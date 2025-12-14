@@ -1,9 +1,18 @@
 import { LoggedInUser } from "@/types";
 import { clsx, type ClassValue } from "clsx";
+import crypto from "node:crypto";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function generateOtp() {
+  // Generate a random number between 10000 and 99999
+  const min = 10000;
+  const max = 99999;
+  const randomBytes = crypto.randomInt(min, max + 1); // randomInt generates an integer in [min, max]
+  return randomBytes.toString();
 }
 
 // Get initials for fallback (e.g., "AS" or "A")
