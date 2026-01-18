@@ -6,6 +6,7 @@ import {
   generateRefreshToken,
 } from "@/lib/auth";
 import { env } from "@/lib/env";
+import { rateLimiters } from "@/lib/rate-limit";
 import { formatZodError } from "@/lib/zod-error-msg";
 import { LoggedInUser } from "@/types";
 import { loginInSchema } from "@/validation/auth/login";
@@ -15,6 +16,10 @@ import prisma from "../../../../lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
     const parsed = loginInSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -27,6 +32,19 @@ export async function POST(req: NextRequest) {
       });
     }
     const { email, password } = parsed.data;
+
+    // Rate limiting: Check login attempts
+    const rateLimitResult = await rateLimiters.login(email, ip);
+
+    if (!rateLimitResult.allowed) {
+      return serverResponse({
+        success: false,
+        message: HTTP_MESSAGE.TOO_MANY_ATTEMPTS,
+        error: rateLimitResult.message || HTTP_MESSAGE.TOO_MANY_ATTEMPTS,
+        data: undefined,
+        status: HTTP_STATUS.TOO_MANY_ATTEMPTS,
+      });
+    }
 
     let loggedInUser: LoggedInUser | null = null;
 
@@ -49,7 +67,7 @@ export async function POST(req: NextRequest) {
       // Validate KEY_ADMIN password
       const isPasswordValid = await comparePassword(
         password,
-        keyAdmin.password
+        keyAdmin.password,
       );
 
       if (!isPasswordValid) {
@@ -123,11 +141,6 @@ export async function POST(req: NextRequest) {
 
     // Attempt to capture client ip / user-agent for refresh token metadata (best-effort)
     // NextRequest does not expose `ip`; prefer X-Forwarded-For (may contain a comma-separated list)
-    const xForwardedFor = req.headers.get("x-forwarded-for");
-    const ip =
-      (xForwardedFor ? xForwardedFor.split(",")[0].trim() : undefined) ||
-      req.headers.get("x-real-ip") ||
-      "";
     const userAgent = req.headers.get("user-agent") || undefined;
     const refreshToken = await generateRefreshToken(loggedInUser.id, {
       expiresIn: "30d",
@@ -162,7 +175,7 @@ export async function POST(req: NextRequest) {
       path: "/",
       maxAge: 30 * 24 * 60 * 60, // 30 days
     });
-    
+
     return response;
   } catch (error) {
     console.error("Login error:", error);

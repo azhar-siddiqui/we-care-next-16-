@@ -4,7 +4,7 @@ interface Props {
 
 export default function AuthLayout({ children }: Props) {
   return (
-    <div className="min-h-screen px-4 md:container mx-auto flex w-full flex-col justify-center space-y-2">
+    <div className="min-h-screen px-4 md:container mx-auto flex w-full flex-col justify-center space-y-2 my-8 md:my-0">
       <div className="mb-4 flex items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"

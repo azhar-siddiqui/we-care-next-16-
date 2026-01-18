@@ -29,6 +29,7 @@ export const userEmailSchema = z
 export const onboardAdminSchema = z.object({
   labName: z
     .string()
+    .trim()
     .min(1, "Lab name is required")
     .max(191, "Lab name must not exceed 191 characters"),
   ownerName: z
@@ -38,6 +39,7 @@ export const onboardAdminSchema = z.object({
   email: userEmailSchema,
   password: z
     .string()
+    .trim()
     .min(4, "Password is required")
     .max(255, "Password must not exceed 255 characters"),
   contactNumber: z

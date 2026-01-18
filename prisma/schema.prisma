@@ -32,17 +32,20 @@ model KeyAdmin {
 }
 
 model Admin {
-  id               String  @id @default(uuid())
-  labName          String  @db.VarChar(120)
-  ownerName        String  @db.VarChar(120)
-  email            String  @unique @db.VarChar(150)
-  password         String  @db.VarChar(255)
-  contactNumber    String  @db.VarChar(20) // phone max 20 chars
-  previousSoftware String? @db.VarChar(200)
-  role             Role    @default(ADMIN)
-
-  keyAdminId String?
-  keyAdmin   KeyAdmin? @relation(fields: [keyAdminId], references: [id])
+  id               String    @id @default(uuid())
+  labName          String    @db.VarChar(120)
+  ownerName        String    @db.VarChar(120)
+  email            String    @unique @db.VarChar(150)
+  password         String    @db.VarChar(255)
+  contactNumber    String    @db.VarChar(20) // phone max 20 chars
+  previousSoftware String?   @db.VarChar(200)
+  role             Role      @default(ADMIN)
+  isActive         Boolean   @default(false)
+  isVerified       Boolean   @default(false)
+  isTrialUsed      Boolean   @default(false)
+  isBlock          Boolean   @default(false)
+  keyAdminId       String?
+  keyAdmin         KeyAdmin? @relation(fields: [keyAdminId], references: [id])
 
   users    User[]
   doctors  Doctor[]

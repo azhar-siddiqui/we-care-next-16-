@@ -3,6 +3,7 @@ import serverResponse from "@/lib/api-response-helper";
 import { hashPassword } from "@/lib/auth";
 import { env } from "@/lib/env";
 import prisma from "@/lib/prisma";
+import { rateLimiters } from "@/lib/rate-limit";
 import { redis, storeOTP } from "@/lib/redis";
 import { sendVerificationEmail } from "@/lib/send-verification-email";
 import { generateOtp } from "@/lib/utils";
@@ -10,9 +11,13 @@ import { formatZodError } from "@/lib/zod-error-msg";
 import { onboardAdminSchema } from "@/validation/auth/register";
 import { NextRequest } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await request.json();
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
     const parsed = onboardAdminSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -35,23 +40,17 @@ export async function POST(req: NextRequest) {
     } = parsed.data;
 
     // Rate limiting: Check signup attempts
-    const rateLimitKey = `signup:attempt:${email}`;
-    const attempts = await redis.get(rateLimitKey);
-    const maxAttempts = 5;
+    const rateLimitResult = await rateLimiters.signup(email, ip);
 
-    if (attempts && Number.parseInt(attempts as string) >= maxAttempts) {
+    if (!rateLimitResult.allowed) {
       return serverResponse({
         success: false,
         message: HTTP_MESSAGE.TOO_MANY_ATTEMPTS,
-        error: HTTP_MESSAGE.TOO_MANY_ATTEMPTS,
+        error: rateLimitResult.message || HTTP_MESSAGE.TOO_MANY_ATTEMPTS,
         data: undefined,
         status: HTTP_STATUS.TOO_MANY_ATTEMPTS,
       });
     }
-
-    // Increment signup attempts
-    await redis.incr(rateLimitKey);
-    await redis.expire(rateLimitKey, Number(env.REDIS_TEMP_ADMIN_TTL)); // 1 hour expiry
 
     // Check if email or contact number already exists
     const existingAdmin = await prisma.admin.findFirst({
@@ -99,7 +98,7 @@ export async function POST(req: NextRequest) {
         contactNumber,
         previousSoftware,
       }),
-      { ex: Number.parseInt(env.REDIS_TEMP_ADMIN_TTL || "600") }
+      { ex: Number.parseInt(env.REDIS_TEMP_ADMIN_TTL || "600") },
     );
 
     return serverResponse({

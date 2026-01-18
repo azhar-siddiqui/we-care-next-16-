@@ -95,13 +95,15 @@ export function UserAuthForm({
           )}
         />
         <div className="flex items-center justify-between">
-          <div className="hidden sm:flex items-center space-x-2 ">
-            <Switch id="remember-me" />
-            <Label htmlFor="remember-me">Remember me</Label>
+          <div className="hidden sm:flex items-center space-x-2 group cursor-pointer">
+            <Switch id="remember-me" className="cursor-pointer" />
+            <Label htmlFor="remember-me" className="text-sm cursor-pointer">
+              Remember me
+            </Label>
           </div>
           <Link
             href="/forgot-password"
-            className="text-muted-foreground text-md font-light hover:opacity-75 hover:text-primary hover:underline underline-offset-4"
+            className="text-muted-foreground text-sm hover:opacity-75 hover:text-primary hover:underline underline-offset-4"
           >
             Forgot password?
           </Link>
@@ -110,6 +112,15 @@ export function UserAuthForm({
           {isPending && <LoaderCircle className="size-4 animate-spin" />}
           Login
         </Button>
+        <div className="w-full flex items-center justify-center gap-x-2">
+          <span>Dont have an account?</span>
+          <Link
+            href="/sign-up"
+            className="text-muted-foreground text-sm hover:opacity-75 hover:text-primary hover:underline underline-offset-4"
+          >
+            Sign up now
+          </Link>
+        </div>
       </form>
     </Form>
   );

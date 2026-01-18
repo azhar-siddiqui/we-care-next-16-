@@ -6,8 +6,6 @@ import {
   Heading,
   Hr,
   Html,
-  //   Img,
-  Link,
   Preview,
   Section,
   Text,
@@ -19,6 +17,7 @@ interface WeCareVerifyEmailProps {
 }
 
 export default function WeCareVerifyEmail({
+  name,
   verificationCode,
 }: Readonly<WeCareVerifyEmailProps>) {
   return (
@@ -26,7 +25,7 @@ export default function WeCareVerifyEmail({
       <Head>
         <Font fontFamily="Poppind" fallbackFontFamily="Verdana" />
       </Head>
-      <Preview>AWS Email Verification</Preview>
+      <Preview>We Care Email Verification</Preview>
       <Body className="bg-white text-gray-800">
         <Container className="p-5 mx-auto bg-gray-200">
           <Section className="bg-white">
@@ -43,9 +42,9 @@ export default function WeCareVerifyEmail({
                 Verify your email address
               </Heading>
               <Text className="text-gray-700 text-sm md:text-base my-6">
-                Thanks for starting the new AWS account creation process. We
-                want to make sure it&apos;s really you. Please enter the
-                following verification code when prompted. If you don&apos;t
+                Hi {name}, thanks for starting the onboarding process with We
+                Care. We want to make sure it&apos;s really you. Please enter
+                the following verification code when prompted. If you don&apos;t
                 want to create an account, you can ignore this message.
               </Text>
               <Section className="flex items-center justify-center">
@@ -63,31 +62,14 @@ export default function WeCareVerifyEmail({
             <Hr className="border-t border-gray-300" />
             <Section className="p-6 md:p-9">
               <Text className="text-sm md:text-base text-gray-700">
-                Amazon Web Services will never email you and ask you to disclose
-                or verify your password, credit card, or banking account number.
+                We Care will never email you and ask you to disclose or verify
+                your password, credit card, or banking account number.
               </Text>
             </Section>
           </Section>
           <Text className="text-xs md:text-sm text-gray-700 px-5">
-            This message was produced and distributed by Amazon Web Services,
-            Inc., 410 Terry Ave. North, Seattle, WA 98109. © 2022, Amazon Web
-            Services, Inc. All rights reserved. AWS is a registered trademark of{" "}
-            <Link
-              href="https://amazon.com"
-              target="_blank"
-              className="text-blue-600 underline"
-            >
-              Amazon.com
-            </Link>
-            , Inc. View our{" "}
-            <Link
-              href="https://amazon.com"
-              target="_blank"
-              className="text-blue-600 underline"
-            >
-              privacy policy
-            </Link>
-            .
+            This message was produced by We Care. © 2024, We Care. All rights
+            reserved.
           </Text>
         </Container>
       </Body>

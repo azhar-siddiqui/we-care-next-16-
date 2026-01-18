@@ -6,16 +6,28 @@ import { env } from "./env";
 
 export async function sendVerificationEmail(
   name: string,
-  email: string,
+  email: string | string[],
   verifyCode: string
 ): Promise<ServerResponseType<null>> {
+  console.log("Domain used for sending email:", env.RESEND_DOMAIN);
   try {
-    await resend.emails.send({
-      from: env.RESEND_DOMAIN,
+    const result = await resend.emails.send({
+      from: `We Care <no-reply@${env.RESEND_DOMAIN}>`,
       to: email,
       subject: "Your We Care OTP for Email Verification",
       react: WeCareVerifyEmail({ name, verificationCode: verifyCode }),
     });
+
+    if (result.error) {
+      console.log("Resend error:", result.error);
+      return {
+        success: false,
+        message: "Failed to send verification email",
+        error: result.error.message || "Unknown error",
+        data: undefined,
+        status: HTTP_STATUS.INTERNAL_ERROR,
+      };
+    }
 
     return {
       success: true,

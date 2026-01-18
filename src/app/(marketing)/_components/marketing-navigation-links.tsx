@@ -15,7 +15,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { JSX } from "react";
 
-
 export default async function MarketingNavigationLink(): Promise<JSX.Element> {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
@@ -88,7 +87,7 @@ export default async function MarketingNavigationLink(): Promise<JSX.Element> {
       Dashboard <ArrowRight className="size-4" />
     </Link>
   ) : (
-    <Link href="/login" className={cn(buttonVariants({ variant: "outline" }))}>
+    <Link href="/login" className={cn(buttonVariants({ variant: "default" }))}>
       Login
     </Link>
   );

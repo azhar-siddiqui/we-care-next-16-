@@ -1,3 +1,4 @@
+import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { env } from "./env";
 
@@ -62,3 +63,8 @@ export async function deleteOTP(email: string) {
   const key = `otp:${email}`;
   await redis.del(key);
 }
+
+export const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, "1 m"), // 10 requests per minute
+});
