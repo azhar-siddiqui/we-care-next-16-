@@ -1,4 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+/**
+ * Next.js Middleware / Proxy Handler
+ *
+ * Consolidated middleware that handles:
+ * 1. Authentication & authorization
+ * 2. Security headers & logging
+ * 3. Request validation & rate limiting
+ */
+
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -6,9 +14,16 @@ import {
   revokeRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
-} from "./lib/auth"; // adjust path
-import { env } from "./lib/env";
-import prisma from "./lib/prisma";
+} from "@/lib/auth";
+import { env } from "@/lib/env";
+import prisma from "@/lib/prisma";
+import {
+  applySecurityHeaders,
+  getClientIP,
+  logSecurityEvent,
+  validateRequestSize,
+} from "@/lib/security";
+import { NextRequest, NextResponse } from "next/server";
 
 // Try refresh token flow and rotate tokens. Returns new tokens when successful.
 async function tryRefreshAndRotate(refreshToken: string) {
@@ -71,7 +86,7 @@ async function getAuthStatus(request: NextRequest) {
 function setAuthCookies(
   resp: NextResponse,
   newAccess: string | null,
-  newRefresh: string | null
+  newRefresh: string | null,
 ) {
   if (newAccess) {
     resp.cookies.set({
@@ -101,11 +116,11 @@ function handleLogin(
   request: NextRequest,
   isValidToken: boolean,
   newAccess: string | null,
-  newRefresh: string | null
+  newRefresh: string | null,
 ) {
   if (isValidToken) {
     const redirectResponse = NextResponse.redirect(
-      new URL("/dashboard/default", request.nextUrl)
+      new URL("/dashboard/default", request.nextUrl),
     );
     setAuthCookies(redirectResponse, newAccess, newRefresh);
     return redirectResponse;
@@ -117,7 +132,7 @@ function handleDashboard(
   request: NextRequest,
   isValidToken: boolean,
   newAccess: string | null,
-  newRefresh: string | null
+  newRefresh: string | null,
 ) {
   if (!isValidToken) {
     return NextResponse.redirect(new URL("/login", request.nextUrl));
@@ -127,21 +142,102 @@ function handleDashboard(
   return resp;
 }
 
-export default async function proxy(request: NextRequest) {
+// Apply security features to response
+function applyProxySecurityHeaders(response: NextResponse, startTime: number) {
+  applySecurityHeaders(response);
+  response.headers.set("X-Request-ID", crypto.randomUUID());
+  response.headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
+  return response;
+}
+
+// Log security events and validate request
+function logProxySecurityEvent(
+  request: NextRequest,
+): { error: true; response: NextResponse } | { error: false } {
+  const ip = getClientIP(request);
+  const userAgent = request.headers.get("user-agent") || "unknown";
+
+  logSecurityEvent("PROXY_REQUEST", {
+    method: request.method,
+    url: request.url,
+    ip,
+    userAgent,
+    timestamp: new Date().toISOString(),
+  });
+
+  // Validate request size (1MB limit)
+  const sizeValidation = validateRequestSize(request, 1024 * 1024);
+  if (!sizeValidation.valid) {
+    logSecurityEvent(
+      "REQUEST_SIZE_EXCEEDED",
+      {
+        ip,
+        userAgent,
+        url: request.url,
+        error: sizeValidation.error,
+      },
+      "warn",
+    );
+
+    return {
+      error: true,
+      response: NextResponse.json(
+        { success: false, error: sizeValidation.error },
+        { status: 413 },
+      ),
+    };
+  }
+
+  return { error: false };
+}
+
+// Main proxy function - exported as both default and named export for Next.js middleware
+async function proxyHandler(request: NextRequest) {
+  const startTime = Date.now();
   const path = request.nextUrl.pathname;
+
+  // Check security and request size
+  const securityCheck = logProxySecurityEvent(request);
+  if (securityCheck.error) {
+    return applyProxySecurityHeaders(securityCheck.response, startTime);
+  }
+
   const { isValidToken, newAccess, newRefresh } = await getAuthStatus(request);
 
+  let response: NextResponse;
+
   if (path === "/login") {
-    return handleLogin(request, isValidToken, newAccess, newRefresh);
+    response = handleLogin(request, isValidToken, newAccess, newRefresh);
+  } else if (path.startsWith("/dashboard")) {
+    response = handleDashboard(request, isValidToken, newAccess, newRefresh);
+  } else if (path === "/") {
+    response = NextResponse.next();
+  } else {
+    response = NextResponse.next();
   }
 
-  if (path.startsWith("/dashboard")) {
-    return handleDashboard(request, isValidToken, newAccess, newRefresh);
-  }
-
-  if (path === "/") {
-    return NextResponse.next();
-  }
-
-  return NextResponse.next();
+  // Apply security headers and logging
+  return applyProxySecurityHeaders(response, startTime);
 }
+
+// Export for Next.js middleware (required name)
+export async function middleware(request: NextRequest) {
+  return proxyHandler(request);
+}
+
+// Export for direct imports
+export default proxyHandler;
+
+// Middleware configuration
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    "/((?!_next/static|_next/image|favicon.ico|public).*)",
+  ],
+};

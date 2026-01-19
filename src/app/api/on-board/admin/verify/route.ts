@@ -209,6 +209,7 @@ export async function POST(request: NextRequest) {
         status: HTTP_STATUS.BAD_REQUEST,
       });
     }
+    await prisma.keyAdmin.findFirst();
 
     // Create admin in PostgreSQL using Prisma
     await prisma.admin.create({

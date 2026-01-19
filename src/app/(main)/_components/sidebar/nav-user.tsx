@@ -25,14 +25,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useUser } from "@/context/user-context";
 import { getInitialsFallbackName } from "@/lib/utils";
+import { LoggedInUser } from "@/types";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-export function NavUser() {
-  const user = useUser();
+interface NavUserProps {
+  user: LoggedInUser | null;
+}
+export function NavUser({ user }: NavUserProps) {
   const router = useRouter();
   const { isMobile } = useSidebar();
 

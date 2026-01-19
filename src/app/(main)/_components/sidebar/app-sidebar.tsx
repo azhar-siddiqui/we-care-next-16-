@@ -15,12 +15,15 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { sidebarItemsForKeyUser } from "@/data/sidebar-data";
+import { useUser } from "@/context/user-context";
+import { sidebarItems, sidebarItemsForKeyUser } from "@/data/sidebar-data";
+import { Role } from "@/types";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 
 export const AppSidebar = React.memo(
   ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+    const user = useUser();
     return (
       <Sidebar {...props}>
         <SidebarHeader>
@@ -39,17 +42,20 @@ export const AppSidebar = React.memo(
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent className="gap-0">
-          {/* <NavMain items={sidebarItems} /> */}
-          <NavMain items={sidebarItemsForKeyUser} />
+          {user?.role === Role.KEY_ADMIN ? (
+            <NavMain items={sidebarItemsForKeyUser} />
+          ) : (
+            <NavMain items={sidebarItems} />
+          )}
           {/* <`NavDocuments` items={data.documents} /> */}
           {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
         </SidebarContent>
         <SidebarFooter>
-          <NavUser />
+          <NavUser user={user} />
         </SidebarFooter>
       </Sidebar>
     );
-  }
+  },
 );
 
 AppSidebar.displayName = "AppSidebar";
