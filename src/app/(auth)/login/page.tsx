@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 import { UserAuthForm } from "./_components/user-auth";
 
 export default function LoginPage() {
@@ -22,7 +23,16 @@ export default function LoginPage() {
       <CardContent>
         <UserAuthForm />
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col justify-center space-y-2">
+        <p className="text-sm">
+          Dont have an account?{" "}
+          <Link
+            href="/sign-up"
+            className="text-muted-foreground text-sm hover:opacity-75 hover:text-primary hover:underline underline-offset-4 transition ease-in-out duration-150"
+          >
+            Sign up now
+          </Link>
+        </p>
         <p className="text-muted-foreground px-8 text-center text-sm">
           By clicking login, you agree to our{" "}
           <a

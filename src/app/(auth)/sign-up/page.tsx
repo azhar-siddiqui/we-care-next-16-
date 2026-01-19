@@ -26,17 +26,17 @@ export default function SignUpPage() {
         <SignUpForm />
       </CardContent>
       <CardFooter className="flex flex-col justify-center space-y-2">
-        <p className="text-md">
+        <p className="text-sm">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="hover:text-primary hover:underline transition underline-offset-4"
+            className=" text-muted-foreground text-sm hover:opacity-75 hover:text-primary hover:underline underline-offset-4 transition ease-in-out duration-150"
           >
             Login
           </Link>
         </p>
         <p className="text-muted-foreground px-8 text-center text-sm">
-          If you have all ready account.
+          If you already have an account.
         </p>
       </CardFooter>
     </Card>

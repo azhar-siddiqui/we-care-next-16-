@@ -80,7 +80,7 @@ export default function SignUpForm() {
                   autoComplete="off"
                   autoFocus
                   className={cn(
-                    form.formState.errors.labName && "placeholder:text-red-400"
+                    form.formState.errors.labName && "placeholder:text-red-400",
                   )}
                 />
               </FormControl>
@@ -101,7 +101,7 @@ export default function SignUpForm() {
                   {...field}
                   className={cn(
                     form.formState.errors.ownerName &&
-                      "placeholder:text-red-400"
+                      "placeholder:text-red-400",
                   )}
                 />
               </FormControl>
@@ -121,7 +121,7 @@ export default function SignUpForm() {
                   }
                   {...field}
                   className={cn(
-                    form.formState.errors.email && "placeholder:text-red-400"
+                    form.formState.errors.email && "placeholder:text-red-400",
                   )}
                 />
               </FormControl>
@@ -140,9 +140,9 @@ export default function SignUpForm() {
                   placeholder={
                     form.formState.errors.password?.message ?? "********"
                   }
-                  className={cn(
+                  inputClassName={cn(
                     form.formState.errors.password &&
-                      "placeholder:text-red-400 border border-red-400"
+                      "placeholder:text-red-400 border border-red-400",
                   )}
                 />
               </FormControl>
@@ -168,7 +168,7 @@ export default function SignUpForm() {
                   className={cn(
                     "rounded-none",
                     form.formState.errors.contactNumber &&
-                      "placeholder:text-red-400"
+                      "placeholder:text-red-400",
                   )}
                 />
               </FormControl>

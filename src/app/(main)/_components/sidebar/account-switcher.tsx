@@ -36,7 +36,7 @@ export function AccountSwitcher({ user }: { user: LoggedInUser | null }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="size-9 rounded-lg">
+        <Avatar className="size-9 rounded-lg border">
           {user?.avatar && (
             <AvatarImage src={user.avatar || undefined} alt={user.name} />
           )}
@@ -54,7 +54,7 @@ export function AccountSwitcher({ user }: { user: LoggedInUser | null }) {
         <DropdownMenuItem
           className={cn(
             "p-0",
-            user?.id && "bg-accent/50 border-l-primary border-l-2"
+            user?.id && "bg-accent/50 border-l-primary border-l-2",
           )}
         >
           <div className="flex w-full items-center justify-between gap-2 px-1 py-1.5">

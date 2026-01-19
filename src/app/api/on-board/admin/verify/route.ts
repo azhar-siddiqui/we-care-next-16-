@@ -209,12 +209,28 @@ export async function POST(request: NextRequest) {
         status: HTTP_STATUS.BAD_REQUEST,
       });
     }
-    await prisma.keyAdmin.findFirst();
+
+    // Ensure keyAdminId is present
+    if (!adminData.keyAdminId) {
+      return serverResponse({
+        success: false,
+        message: "Key admin ID is missing",
+        error: "Key admin ID is missing from pending data",
+        data: undefined,
+        status: HTTP_STATUS.BAD_REQUEST,
+      });
+    }
 
     // Create admin in PostgreSQL using Prisma
     await prisma.admin.create({
       data: {
-        ...adminData,
+        labName: adminData.labName,
+        ownerName: adminData.ownerName,
+        email: adminData.email,
+        password: adminData.password,
+        contactNumber: adminData.contactNumber,
+        previousSoftware: adminData.previousSoftware,
+        keyAdminId: adminData.keyAdminId,
         isVerified: true,
       },
     });

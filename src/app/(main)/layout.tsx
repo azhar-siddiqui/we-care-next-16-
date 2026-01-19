@@ -45,14 +45,31 @@ export default async function Layout({
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
   // Verify access token and fetch layout preferences in parallel
-  const [accessPayload, sidebarVariant, sidebarCollapsible, contentLayout, navbarStyle] =
-    await Promise.all([
-      accessToken ? verifyAccessToken(accessToken) : null,
-      getPreference<SidebarVariant>("sidebar_variant", SIDEBAR_VARIANT_VALUES, "inset"),
-      getPreference<SidebarCollapsible>("sidebar_collapsible", SIDEBAR_COLLAPSIBLE_VALUES, "icon"),
-      getPreference<ContentLayout>("content_layout", CONTENT_LAYOUT_VALUES, "centered"),
-      getPreference<NavbarStyle>("navbar_style", NAVBAR_STYLE_VALUES, "scroll"),
-    ]);
+  const [
+    accessPayload,
+    sidebarVariant,
+    sidebarCollapsible,
+    contentLayout,
+    navbarStyle,
+  ] = await Promise.all([
+    accessToken ? verifyAccessToken(accessToken) : null,
+    getPreference<SidebarVariant>(
+      "sidebar_variant",
+      SIDEBAR_VARIANT_VALUES,
+      "inset",
+    ),
+    getPreference<SidebarCollapsible>(
+      "sidebar_collapsible",
+      SIDEBAR_COLLAPSIBLE_VALUES,
+      "icon",
+    ),
+    getPreference<ContentLayout>(
+      "content_layout",
+      CONTENT_LAYOUT_VALUES,
+      "centered",
+    ),
+    getPreference<NavbarStyle>("navbar_style", NAVBAR_STYLE_VALUES, "scroll"),
+  ]);
 
   let user: LoggedInUser | null = accessPayload?.loggedInUser ?? null;
 
@@ -74,10 +91,16 @@ export default async function Layout({
         // Type-safe helpers that narrow unknown object shapes without using `any`
         const getName = (obj: unknown): string => {
           if (obj && typeof obj === "object") {
-            if ("name" in obj && typeof (obj as { name: unknown }).name === "string") {
+            if (
+              "name" in obj &&
+              typeof (obj as { name: unknown }).name === "string"
+            ) {
               return (obj as { name: string }).name;
             }
-            if ("ownerName" in obj && typeof (obj as { ownerName: unknown }).ownerName === "string") {
+            if (
+              "ownerName" in obj &&
+              typeof (obj as { ownerName: unknown }).ownerName === "string"
+            ) {
               return (obj as { ownerName: string }).ownerName;
             }
           }
@@ -86,10 +109,16 @@ export default async function Layout({
 
         const getEmail = (obj: unknown): string => {
           if (obj && typeof obj === "object") {
-            if ("email" in obj && typeof (obj as { email: unknown }).email === "string") {
+            if (
+              "email" in obj &&
+              typeof (obj as { email: unknown }).email === "string"
+            ) {
               return (obj as { email: string }).email;
             }
-            if ("username" in obj && typeof (obj as { username: unknown }).username === "string") {
+            if (
+              "username" in obj &&
+              typeof (obj as { username: unknown }).username === "string"
+            ) {
               return (obj as { username: string }).username;
             }
           }
@@ -97,14 +126,24 @@ export default async function Layout({
         };
 
         const getAvatar = (obj: unknown): string | undefined => {
-          if (obj && typeof obj === "object" && "avatar" in obj && typeof (obj as { avatar: unknown }).avatar === "string") {
+          if (
+            obj &&
+            typeof obj === "object" &&
+            "avatar" in obj &&
+            typeof (obj as { avatar: unknown }).avatar === "string"
+          ) {
             return (obj as { avatar: string }).avatar;
           }
           return undefined;
         };
 
         const getRole = (obj: unknown): Role => {
-          if (obj && typeof obj === "object" && "role" in obj && typeof (obj as { role: unknown }).role === "string") {
+          if (
+            obj &&
+            typeof obj === "object" &&
+            "role" in obj &&
+            typeof (obj as { role: unknown }).role === "string"
+          ) {
             return (obj as { role: Role }).role;
           }
           return Role.USER;
@@ -120,7 +159,9 @@ export default async function Layout({
 
         // Revoke the old refresh token and issue rotated tokens
         await revokeRefreshToken(verified.jti);
-        const newRefresh = await generateRefreshToken(userId, { expiresIn: "30d" });
+        const newRefresh = await generateRefreshToken(userId, {
+          expiresIn: "30d",
+        });
         const newAccess = await generateAccessToken(loggedInUser, "15m");
 
         // Persist cookies server-side (path, httpOnly, secure in prod, sameSite strict)
@@ -165,7 +206,7 @@ export default async function Layout({
             "data-[content-layout=centered]:mx-auto! data-[content-layout=centered]:max-w-screen-2xl",
             // Adds right margin for inset sidebar in centered layout up to 113rem.
             // On wider screens with collapsed sidebar, removes margin and sets margin auto for alignment.
-            "max-[113rem]:peer-data-[variant=inset]:mr-2! min-[101rem]:peer-data-[variant=inset]:peer-data-[state=collapsed]:mr-auto!"
+            "max-[113rem]:peer-data-[variant=inset]:mr-2! min-[101rem]:peer-data-[variant=inset]:peer-data-[state=collapsed]:mr-auto!",
           )}
         >
           <header
@@ -174,7 +215,7 @@ export default async function Layout({
             className={cn(
               "flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12",
               // Handle sticky navbar style with conditional classes so blur, background, z-index, and rounded corners remain consistent across all SidebarVariant layouts.
-              "data-[navbar-style=sticky]:bg-background/50 data-[navbar-style=sticky]:sticky data-[navbar-style=sticky]:top-0 data-[navbar-style=sticky]:z-50 data-[navbar-style=sticky]:overflow-hidden data-[navbar-style=sticky]:rounded-t-[inherit] data-[navbar-style=sticky]:backdrop-blur-md"
+              "data-[navbar-style=sticky]:bg-background/50 data-[navbar-style=sticky]:sticky data-[navbar-style=sticky]:top-0 data-[navbar-style=sticky]:z-50 data-[navbar-style=sticky]:overflow-hidden data-[navbar-style=sticky]:rounded-t-[inherit] data-[navbar-style=sticky]:backdrop-blur-md",
             )}
           >
             <div className="flex w-full items-center justify-between px-4 lg:px-6">

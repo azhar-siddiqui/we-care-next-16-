@@ -87,6 +87,19 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Retrieve keyAdmin to get the keyAdminId
+    const keyAdmin = await prisma.keyAdmin.findFirst();
+
+    if (!keyAdmin) {
+      return serverResponse({
+        success: false,
+        message: "No key admin found in the system",
+        error: "System configuration error: No key admin found",
+        data: undefined,
+        status: HTTP_STATUS.INTERNAL_ERROR,
+      });
+    }
+
     // Temporarily store admin data in Redis (until verified)
     await redis.set(
       `pending:admin:${email}`,
@@ -97,6 +110,7 @@ export async function POST(request: NextRequest) {
         password: await hashPassword(password),
         contactNumber,
         previousSoftware,
+        keyAdminId: keyAdmin.id,
       }),
       { ex: Number.parseInt(env.REDIS_TEMP_ADMIN_TTL || "600") },
     );
