@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { UserAuthForm } from "./_components/user-auth";
+import { LoginForm } from "./_components/LoginForm";
 
 export default function LoginPage() {
   return (
@@ -21,7 +21,7 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <UserAuthForm />
+        <LoginForm />
       </CardContent>
       <CardFooter className="flex flex-col justify-center space-y-2">
         <p className="text-sm">

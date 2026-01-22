@@ -234,7 +234,7 @@ export default async function Layout({
               </div>
             </div>
           </header>
-          <div className="h-full p-4 md:p-6">{children}</div>
+          <div className="h-full p-4">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </UserProvider>

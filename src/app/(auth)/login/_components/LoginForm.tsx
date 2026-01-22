@@ -29,7 +29,7 @@ import { toast } from "sonner";
 
 type UserAuthFormProps = HTMLAttributes<HTMLFormElement>;
 
-export function UserAuthForm({
+export function LoginForm({
   className,
   ...props
 }: Readonly<UserAuthFormProps>) {
@@ -39,8 +39,8 @@ export function UserAuthForm({
   const form = useForm<z.infer<typeof loginInSchema>>({
     resolver: zodResolver(loginInSchema),
     defaultValues: {
-      email: "weCareKeyAdmin7558@gmail.com",
-      password: "WeCareKeyAdmin@7558",
+      email: "azhartsiddiqui@gmail.com",
+      password: "qwer1234",
     },
   });
 
@@ -73,6 +73,7 @@ export function UserAuthForm({
                 placeholder="Jhon@we-care.com"
                 autoComplete="off"
                 disabled={isPending}
+                autoFocus
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>

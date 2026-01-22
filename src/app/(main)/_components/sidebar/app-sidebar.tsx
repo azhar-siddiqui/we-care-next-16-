@@ -13,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 
 import { useUser } from "@/context/user-context";
@@ -53,6 +54,7 @@ export const AppSidebar = React.memo(
         <SidebarFooter>
           <NavUser user={user} />
         </SidebarFooter>
+        <SidebarRail />
       </Sidebar>
     );
   },

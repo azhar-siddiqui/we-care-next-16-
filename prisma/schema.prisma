@@ -15,6 +15,26 @@ enum Role {
   PATIENT
 }
 
+enum Designation {
+  Mr
+  Mrs
+  Miss
+  Baby
+  Other
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum Age {
+  Year
+  Month
+  Days
+}
+
 model KeyAdmin {
   id       String @id @default(uuid())
   name     String @db.VarChar(100) // limit name length
@@ -79,13 +99,13 @@ model User {
 model Doctor {
   id             String  @id @default(uuid())
   name           String  @db.VarChar(100)
-  email          String  @unique @db.VarChar(150)
-  contactNumber  String  @db.VarChar(20)
+  email          String? @unique @db.VarChar(150)
+  contactNumber  String? @db.VarChar(20)
   specialization String? @db.VarChar(250)
   role           Role    @default(DOCTOR)
 
-  adminId String
-  admin   Admin  @relation(fields: [adminId], references: [id])
+  adminId String?
+  admin   Admin?  @relation(fields: [adminId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

@@ -1,15 +1,5 @@
+import { ALLOWED_EMAIL_DOMAINS } from "@/types/domain";
 import { z } from "zod";
-
-export const ALLOWED_EMAIL_DOMAINS = [
-  "wecare.com",
-  "gmail.com",
-  "yahoo.com",
-  "outlook.com",
-  "icloud.com",
-  "zoho.com",
-  "proton.me",
-  "yandex.ru",
-];
 
 export const userEmailSchema = z
   .email("Invalid email format")
@@ -21,9 +11,9 @@ export const userEmailSchema = z
     },
     {
       message: `Email domain must be one of: ${ALLOWED_EMAIL_DOMAINS.join(
-        ", "
+        ", ",
       )}`,
-    }
+    },
   );
 
 export const onboardAdminSchema = z.object({

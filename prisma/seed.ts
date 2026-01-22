@@ -38,6 +38,16 @@ async function main() {
     },
   });
 
+  await prisma.doctor.create({
+    data: {
+      name: "Self Referral",
+      email: null,
+      contactNumber: null,
+      specialization: null,
+      role: Role.DOCTOR,
+    },
+  });
+
   console.log("✔ Key Admin created successfully:", keyAdmin);
 }
 
